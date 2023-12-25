@@ -6,6 +6,8 @@
 python Final/MagnifyingGlass.py
 ```
 
+## 需求
+
 ![【要求】软件设计实作](【要求】软件设计实作.png "需求")
 
 ## 相关技术
