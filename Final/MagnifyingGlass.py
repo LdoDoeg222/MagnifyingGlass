@@ -1,3 +1,8 @@
+# Encoding by UTF-8
+# Author: LdoDoeg222
+# 作者：Dy镝
+
+
 import tkinter as tk
 from PIL import ImageGrab, ImageTk
 
@@ -13,24 +18,28 @@ class Viewer(tk.Tk):
         self.title("桌面透视工具 By Dy镝（取景框默认生成在左上角）")
         self.geometry("{}x{}".format(w, h))  # 窗口位置
 
-        self.scanner = Scanner(self)
-        self.after(func=self.run, ms=10)
+        self.scanner = Scanner(self)  # 创建 Scanner 对象
+        self.after(func=self.run, ms=10)  # 循环绘制
         self.canvas = tk.Canvas(self, width=w, height=h)
         self.canvas.pack(fill=tk.BOTH, expand=tk.YES)
 
     def run(self):
         global immg
+        # （1）获取 Scanner 位置
         x, y = self.scanner.winfo_x(), self.scanner.winfo_y()
         w, h = self.scanner.w, self.scanner.h
-        # 绘制
+        # （2）获取 Scanner 所在位置的图像
         grabber = ImageGrab.grab((x, y, x + w, y + h))
         # 需求补充：左半屏不放大，右半屏幕放大
         if x <= 960:
             resize_grabber = grabber
         else:
+            # （3）通过 resize 放大
             resize_grabber = grabber.resize((rate * w, rate * h))
         immg = ImageTk.PhotoImage(resize_grabber)
+        # （4）绘制放大后图像
         self.canvas.create_image(rate * w / 2, rate * h / 2, image=immg)
+        # （5）实时重绘
         self.after(func=self.run, ms=10)
 
 
@@ -42,7 +51,7 @@ class Scanner(tk.Toplevel):
         color = (255, 255, 0)
         dash = (30, 10)
         self.attributes("-alpha", 0.2)  # 透明度
-        self.attributes("-topmost", 1)
+        self.attributes("-topmost", 1)  # 置顶
         self.overrideredirect(True)  # 取消窗口菜单
 
         # 虚线框
@@ -55,14 +64,13 @@ class Scanner(tk.Toplevel):
 
         self.geometry("{}x{}".format(w, h))
 
-        # 绑定鼠标
+        # 绑定鼠标事件
         self.bind("<ButtonPress-1>", self.start_dragging)
         self.bind("<ButtonRelease-1>", self.stop_dragging)
         self.bind("<B1-Motion>", self.do_dragging)
 
         self.x = 0
         self.y = 0
-        # self.after(func=self.run, ms=10)
 
     def start_dragging(self, event):  # 记录起点 x, y
         self.x = event.x
@@ -82,14 +90,6 @@ class Scanner(tk.Toplevel):
         # print(f"+{self.winfo_x()}+{self.winfo_y()}")  # 窗口之于屏幕 xy
         # print(f"+{deltax}+{deltay}")  # 相对 xy
         self.geometry(f"+{new_x}+{new_y}")
-
-    # def run(self):
-    #     global immg
-    #     x, y = self.winfo_x(), self.winfo_y()
-    #     xx = ImageGrab.grab((x, y, x + self.w, y + self.h))
-    #     immg = ImageTk.PhotoImage(xx)
-    #     self.canvas.create_image(rate * self.w / 2, rate * self.h / 2, image=immg)
-    #     self.after(func=self.run, ms=10)
 
 
 if __name__ == "__main__":
